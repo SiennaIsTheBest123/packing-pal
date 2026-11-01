@@ -18,14 +18,17 @@ It's a single `index.html` file with no build step. It's hosted on Vercel and us
 - Refreshing the page reopens the trip you were on. Changes made on another device load automatically.
 
 **Trip set-up in four steps**
-1. **Where are you going?** Pick from a dropdown of 70 destinations (cities, beaches, countryside, winter breaks and ski resorts) or type anywhere. Then choose the type of trip from 14 options: Beach & sun, City break, Sightseeing tour, Countryside & walking, Road trip, Cruise, Theme parks & family fun, Spa & wellness, Camping, Festival or event, Adventure & safari, Business trip, Winter sightseeing, and Ski / snowboard.
+1. **Where are you going?** Type any city or country and pick it from the search results, or choose from 70 popular destinations (cities, beaches, countryside, winter breaks and ski resorts). Then choose the type of trip from 14 options: Beach & sun, City break, Sightseeing tour, Countryside & walking, Road trip, Cruise, Theme parks & family fun, Spa & wellness, Camping, Festival or event, Adventure & safari, Business trip, Winter sightseeing, and Ski / snowboard.
 2. **Pick your dates.** A monthly calendar: tap the day you leave, then the day you come home. It shows how many days are left until you go.
 3. **Who's travelling?** Name and age. The age sets the app's theme and adjusts the list:
    - **Sunny** (0–12): bigger, rounder, with kids' extras such as snacks and a comfort toy
-   - **Night Flight** (13–19): a dark theme with teen extras such as headphones and a second power bank
-   - **Classic** (20–59)
+   - **Classic** (13–59)
    - **Easy Read** (60+): larger text, stronger contrast and comfort items
-4. **Weather.** Typical daytime highs and night-time lows for that destination and month, with a weather icon (sunny, sunny spells, cloudy, rain, sleet, snow or storms).
+4. **Weather.** Real weather for your dates, with a weather icon for the trip and for each day (sunny, sunny spells, cloudy, rain, sleet, snow or storms):
+   - **Forecast:** if the trip starts within the next 14 days, a day-by-day forecast with highs, lows and the chance of rain.
+   - **Typical weather:** if the trip is further away, the average for the same dates over the past five years, clearly labelled. It switches to the real forecast automatically once the trip is 14 days away.
+
+**Packing that follows the weather.** Warm clothes when it's cold, a raincoat and umbrella when rain is likely, extra sun cream, after-sun and a sun hat when it's hot and sunny, and snow gear when snow is likely. Daily Outfits uses each day's own weather too.
 
 **Countdown.** The trip summary shows how many days are left until the trip, "Tomorrow!", "It's today!", which day of the trip you're on, or "Trip finished".
 
@@ -82,7 +85,7 @@ The publishable key is designed to be public, so it's safe in the file. Never pu
 
 - **Saved trips:** each trip is one row in the `trips` table. The `data` column holds the whole trip (destination, dates, traveller, weather, lists, ticks, quantities, outfits, plans, saved ideas and colour) as JSON. The `name` column holds a short label such as "Lisbon · Fri 20 Nov – Wed 25 Nov".
 - **Offline use:** the open trip is also kept in the browser, so it still works if the connection drops. Changes are sent to Supabase when the connection comes back. Logging out removes trips from that browser.
-- **Weather data:** each built-in destination has typical monthly high and low temperatures (climate averages) stored in the file. These are not live forecasts. The app reminds travellers to check a real forecast about 10 days before they fly. For places not on the list, the traveller picks the usual climate (Freezing, Cold, Mild, Warm or Hot).
+- **Weather data:** from [Open-Meteo](https://open-meteo.com), which is free and needs no key. The place search uses Open-Meteo's geocoding service to find the exact location. Trips starting within 14 days use the forecast service; trips further ahead use the historical weather archive for the same dates over the past five years. Forecasts refresh every few hours when the trip is opened. If the weather service can't be reached, popular destinations fall back to built-in monthly averages and other places let the traveller pick the usual climate.
 - **Outfit ideas:** the Daily Outfits page looks for activity words in your plans, such as *hike*, *beach*, *dinner*, *museum*, *temple*, *spa*, *meeting* or *boat*. It combines them with the day's weather and the trip type to suggest clothes. With no plans entered, it suggests clothes from the weather and trip type, plus comfy travel clothes on the first and last days.
 - **Things to Do ideas and photos:** the app finds real places near the destination using Wikipedia's free API, ranks them by the traveller's interests, and shows their photos from Wikimedia Commons with a credit link on each details page. Places without a suitable photo are left out. Opening times and prices aren't included, so the app tells travellers to check before they go.
 
@@ -96,13 +99,14 @@ README.md    This file
 External resources:
 - **Supabase JavaScript library** (`@supabase/supabase-js` version 2) from cdn.jsdelivr.net, for logins and saving.
 - **Google Fonts** (Fredoka, Nunito and Atkinson Hyperlegible). Without them the app falls back to standard system fonts.
+- **Open-Meteo**, for place search, forecasts and typical weather.
 - **Wikipedia and Wikimedia Commons**, for Things to Do ideas and photos.
 
 ## Customising
 
 All the content lives in the `<script>` block inside `index.html`:
 
-- **Add or edit destinations:** the `PLACES` object. Each entry has a trip type, altitude in metres, and 12 monthly highs and lows in °C (January to December):
+- **Add or edit popular destinations:** the `PLACES` object. Its monthly temperatures are only used if the weather service can't be reached. Each entry has a trip type, altitude in metres, and 12 monthly highs and lows in °C (January to December):
   ```js
   "Lisbon, Portugal":{t:"city",alt:0,hi:[15,16,19,20,23,26,28,29,27,23,18,15],lo:[8,9,11,12,14,17,18,19,18,15,11,9]},
   ```
